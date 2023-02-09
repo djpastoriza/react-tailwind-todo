@@ -1,31 +1,86 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './components/Header';
 import TodoComputed from './components/TodoComputed';
 import TodoCreate from './components/TodoCreate';
 import TodoFilter from './components/TodoFilter';
 import TodoList from './components/TodoList';
+import { v4 as uuid } from 'uuid';
 
-const initialState = [
-  {id:1,title:'Go to the gym', completed:true},
-  {id:2,title:'Meditation', completed:false},
-  {id:3,title:'Study english', completed:false},
-  {id:4,title:'Pick up groceries', completed:false},
-  {id:5,title:'Do Homework', completed:false},
-]
-
+const initialState = JSON.parse(localStorage.getItem('todos'));
 
 const App = () => {
+  const [todos, setTodos] = useState(initialState);
+  const [filter, setFilter] = useState('all');
 
-  const [todos,setTodos] = useState(initialState);
+  const computedItemsLeft = todos.filter((t) => !t.completed).length;
+
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  const createTodo = (title) => {
+    const newTodo = {
+      id: uuid(),
+      title: title.trim(),
+      completed: false,
+    };
+    setTodos([...todos, newTodo]);
+  };
+
+  const updateTodo = (id) => {
+    const newTodos = todos.map((t) => {
+      if (t.id === id) {
+        t.completed = !t.completed;
+      }
+      return t;
+    });
+    setTodos(newTodos);
+  };
+
+  const deleteTodo = (id) => {
+    const newTodos = todos.filter((t) => {
+      if (t.id !== id) return t;
+    });
+    setTodos(newTodos);
+  };
+
+  const clearCompleted = () => {
+    const newTodos = todos.filter((t) => !t.completed);
+    setTodos(newTodos);
+  };
+
+  const filteredTodos = () => {
+    switch (filter) {
+      case 'all':
+        return todos;
+      case 'active':
+        return todos.filter((t) => !t.completed);
+      case 'completed':
+        return todos.filter((t) => t.completed);
+      default:
+        return todos;
+    }
+  };
+
+  const changeFilter = (filter) => {
+    setFilter(filter);
+  }
 
   return (
     <div className="bg-gray-300 bg-[url('./assets/images/bg-mobile-light.jpg')] bg-contain bg-no-repeat">
       <Header />
       <main className="container mx-auto mt-8 px-4">
-        <TodoCreate />
-        <TodoList todos={todos}/>
-        <TodoComputed />
-        <TodoFilter />
+        <TodoCreate createTodo={createTodo} />
+        <TodoList
+          todos={filteredTodos()}
+          updateTodo={updateTodo}
+          deleteTodo={deleteTodo}
+        />
+        <TodoComputed
+          computedItemsLeft={computedItemsLeft}
+          clearCompleted={clearCompleted}
+        />
+        <TodoFilter filter={filter} changeFilter={changeFilter} />
       </main>
       <footer className="mt-8 text-center">
         Drag and drop to reorder list
