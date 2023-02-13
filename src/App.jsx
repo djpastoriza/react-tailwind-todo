@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { DragDropContext } from '@hello-pangea/dnd';
+import { v4 as uuid } from 'uuid';
+import { useEffect, useState } from 'react';
 import Header from './components/Header';
 import TodoComputed from './components/TodoComputed';
 import TodoCreate from './components/TodoCreate';
 import TodoFilter from './components/TodoFilter';
 import TodoList from './components/TodoList';
-import { v4 as uuid } from 'uuid';
 
 const initialState = JSON.parse(localStorage.getItem('todos'));
 
@@ -66,6 +67,18 @@ const App = () => {
     setFilter(filter);
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) {
+      return;
+    }
+    const startIndex = result.source.index;
+    const endIndex = result.destination.index;
+    const copyArray = [...todos];
+    const [reorderedItem] = copyArray.splice(startIndex, 1);
+    copyArray.splice(endIndex, 0, reorderedItem);
+    setTodos(copyArray);
+  };
+
   return (
     <div
       className="min-h-screen bg-gray-300 bg-[url('./assets/images/bg-mobile-light.jpg')] 
@@ -76,11 +89,14 @@ const App = () => {
       <Header />
       <main className="container mx-auto mt-8 px-4 md:max-w-xl">
         <TodoCreate createTodo={createTodo} />
-        <TodoList
-          todos={filteredTodos()}
-          updateTodo={updateTodo}
-          deleteTodo={deleteTodo}
-        />
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <TodoList
+            todos={filteredTodos()}
+            updateTodo={updateTodo}
+            deleteTodo={deleteTodo}
+            handleDragEnd={handleDragEnd}
+          />
+        </DragDropContext>
         <TodoComputed
           computedItemsLeft={computedItemsLeft}
           clearCompleted={clearCompleted}

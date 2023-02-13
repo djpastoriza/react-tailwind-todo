@@ -17,8 +17,6 @@ const Header = () => {
     localStorage.setItem('theme', 'light')
   }, [darkMode]);
 
-  const handleClickToggleTheme = () => {};
-
   return (
     <header className="container mx-auto px-4 pt-8 md:max-w-xl">
       <div className="flex justify-between">
