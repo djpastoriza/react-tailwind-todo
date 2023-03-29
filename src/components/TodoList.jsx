@@ -10,7 +10,7 @@ const TodoList = ({ todos, updateTodo, deleteTodo }) => {
           {...droppableProvided.droppableProps}
           className="mt-8 overflow-hidden rounded-t-md bg-white transition-all duration-1000 dark:bg-gray-800 [&>article]:p-4"
         >
-          {todos.map((todo, index) => (
+          {todos?.map((todo, index) => (
             <Draggable key={todo.id} index={index} draggableId={`${todo.id}`}>
               {(draggableProvided) => (
                 <TodoItem

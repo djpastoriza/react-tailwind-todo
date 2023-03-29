@@ -7,13 +7,13 @@ import TodoCreate from './components/TodoCreate';
 import TodoFilter from './components/TodoFilter';
 import TodoList from './components/TodoList';
 
-const initialState = JSON.parse(localStorage.getItem('todos'));
+const initialState = JSON.parse(localStorage.getItem('todos')) || [];
 
 const App = () => {
   const [todos, setTodos] = useState(initialState);
   const [filter, setFilter] = useState('all');
 
-  const computedItemsLeft = todos.filter((t) => !t.completed).length;
+  const computedItemsLeft = todos?.filter((t) => !t.completed).length;
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -39,14 +39,14 @@ const App = () => {
   };
 
   const deleteTodo = (id) => {
-    const newTodos = todos.filter((t) => {
+    const newTodos = todos?.filter((t) => {
       if (t.id !== id) return t;
     });
     setTodos(newTodos);
   };
 
   const clearCompleted = () => {
-    const newTodos = todos.filter((t) => !t.completed);
+    const newTodos = todos?.filter((t) => !t.completed);
     setTodos(newTodos);
   };
 
@@ -55,9 +55,9 @@ const App = () => {
       case 'all':
         return todos;
       case 'active':
-        return todos.filter((t) => !t.completed);
+        return todos?.filter((t) => !t.completed);
       case 'completed':
-        return todos.filter((t) => t.completed);
+        return todos?.filter((t) => t.completed);
       default:
         return todos;
     }
